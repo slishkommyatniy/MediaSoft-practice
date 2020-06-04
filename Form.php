@@ -1,7 +1,7 @@
 <?php
 //Открытие и создание копии файла
-$new_file = $_FILES['text']['name']; // для файлов
-$new_description = $_POST['description']; // для текстового поля
+$new_file = $_FILES['text']['name']; // Для файлов
+$new_description = $_POST['description']; // Для текстового поля
 
 if (copy($_FILES['text']['tmp_name'], $new_file)) {
     echo "Файл загружен". PHP_EOL;
@@ -12,71 +12,58 @@ else  {
     echo "Ошибка при загрузке файла" . PHP_EOL;
     }
 
+function conversion($text){
+    $text_lower = mb_strtolower($text); //В нижний регистр
+    $text_delete_symbols = str_replace(["\r\n", "\r", "\n", ".", ","], "", $text_lower); //Удаление точек,запятых,переноса строк и тд
+    $Spaces = explode(" ", $text_delete_symbols);  // Разделение слов по пробелу
+    return ($Spaces);
+}
 
-function file_csv($new_file) // Функция для файлов
-{
-    $text = file_get_contents($new_file); // Чтения файла
-    $text_lower = mb_strtolower($text, 'UTF-8'); //Нижний регистр
-    $text_delete_symbols = str_replace(["\r\n", "\r", "\n", ".", ","], "", $text_lower); //Удаление знаков припинания и переноса строки
-    $NoSpaces = explode(" ", $text_delete_symbols);  // Разделение слов по пробелу
-    $WordCount = count($NoSpaces); //Суммарное число слов
-    $result = array_count_values($NoSpaces);
-    $EntryWords = print_r($result, true); //Подсчёт вхождений слов
+function file_csv($new_file) {
+    $text = file_get_contents($new_file); // Чтение файла
+    $Spaces = conversion($text); //Преобразование
+    $result =array_count_values($Spaces); // Число вхождений каждого слова
+    $WordCount = count($Spaces); //Суммарное число слов
 
-    touch("file.csv"); //Создание файла
-    $fp = fopen(__DIR__ . DIRECTORY_SEPARATOR .'file.csv', 'w'); // Открытие этого файла
+    //Создание файла
+    mkdir("texts"); // новая папка
+    $filename = date_create_from_format('U.u', microtime(true))->format('Y-m-d_H-i-s_u');;
+    $extension = 'csv';
+    $fp = fopen ( "texts". "/" . $filename . "." . $extension,"w"); //Создание файла csv в папке texts,его открытие и последующая запись
+
     //Запись в файл
     foreach ($result as $word => $count) {
         fputcsv($fp, [$word, $count], ',');
     }
+    fputcsv($fp,["Сумарное число слов",$WordCount],",");
     fclose($fp);
 
-    //Перемещение файла
-    mkdir("texts"); // новая папка
-    if (rename('file.csv', 'texts/file.csv')) {
-        echo "Файл успешно перемещен!" . PHP_EOL;
-    }else{
-        echo "Файл не удалось переместить!" . PHP_EOL;
-    }
+
     unlink($new_file); //удаление копии файла
 }
+function textarea_csv($new_description){
+    $Spaces = conversion($new_description);
+    $result =array_count_values($Spaces);
+    $WordCount = count($Spaces); //Суммарное число слов
 
-function textarea_csv($new_description)
-{
-    $text_lower = mb_strtolower($new_description, 'UTF-8'); //Нижний регистр
-    $text_delete_symbols = str_replace(["\r\n", "\r", "\n", ".", ","], "", $text_lower); //Удаление знаков припинания и переноса строки
-    $NoSpaces = explode(" ", $text_delete_symbols);  // Разделение слов по пробелу
-    $WordCount = count($NoSpaces); //Суммарное число слов
-    $result = array_count_values($NoSpaces);
-    $EntryWords = print_r($result, true); //Подсчёт вхождений слов
+    //Создание файла
+    mkdir("texts"); // новая папка
+    $filename = date_create_from_format('U.u', microtime(true))->format('Y-m-d_H-i-s_u');;
+    $extension = 'csv';
+    $fp = fopen ( "texts". "/" . $filename . "." . $extension,"w"); //Создание файла csv в папке texts,его открытие и последующая запись
 
-    touch("textarea.csv"); //Создание файла
-    $fp = fopen(__DIR__ . DIRECTORY_SEPARATOR .'textarea.csv', 'w'); // Открытие этого файла
     //Запись в файл
     foreach ($result as $word => $count) {
         fputcsv($fp, [$word, $count], ',');
     }
+    fputcsv($fp,["Сумарное число слов",$WordCount],",");
     fclose($fp);
-
-    //Перемещение файла
-    mkdir("texts"); // новая папка
-    if (rename('textarea.csv', 'texts/textarea.csv')) {
-        echo "Файл успешно перемещен!" . PHP_EOL;
-    }else{
-        echo "Файл не удалось переместить!" . PHP_EOL;
-    }
 }
  //Проверки
-if (!empty($new_file) && !empty($new_description))
-{
-    textarea_csv($new_description);
-    file_csv($new_file);
-
-} else if (!empty($new_file) && empty($new_description)){
+if (!empty($new_file)) {
     file_csv($new_file);
 }
-else if (!empty($new_description) && empty($new_file)){
+if (!empty($new_description)) {
     textarea_csv($new_description);
-} else
-    echo "Текст не найден" . PHP_EOL;
+}
 ?>
