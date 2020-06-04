@@ -19,4 +19,5 @@ $result =  explode (" ",$text_delete_symbols) ;  // Разделение сло�
 print_r (array_count_values($result)); //Подсчёт вхождений слов
 
 $WordCount =  count($result); //Суммарное число слов
+
 echo "Всего кол-во слов = ", $WordCount;
