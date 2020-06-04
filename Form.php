@@ -80,4 +80,3 @@ else if (!empty($new_description) && empty($new_file)){
 } else
     echo "Текст не найден" . PHP_EOL;
 ?>
-
