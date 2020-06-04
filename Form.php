@@ -80,9 +80,4 @@ else if (!empty($new_description) && empty($new_file)){
 } else
     echo "Текст не найден" . PHP_EOL;
 ?>
-<form action="Form.php" method = "post" enctype = "multipart/form-data">
-    <input type = "file" name = "text" > <br>
-    <textarea name = "description" ></textarea> <br>
-    <button type="submit">Отправить форму</button></p>
-</form>
 
