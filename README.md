@@ -8,3 +8,9 @@
 ### indexForm.php - форма 
 ### Form.php - логика
 ### Запуск через indexForm.php
+
+## ДЗ №3 - БД
+### mybd.sql - sql-запрос на создание 
+### mainpage.php - главная страница
+### index.php - страница с загрузкой
+### details.php - страница с деталями
