@@ -34,7 +34,6 @@ function file_csv($new_file, $insertQueryWordsDB, $insertQueryUploaded_TextDB,$p
     $insertQueryUploaded_TextDB ->execute([$file,$text]);
     $Spaces = conversion($file);
     $result = array_count_values($Spaces);
-    $WordCount = count($Spaces); //Суммарное число слов
 
     $text_id = $pdo -> lastInsertId();
 
@@ -44,19 +43,18 @@ function file_csv($new_file, $insertQueryWordsDB, $insertQueryUploaded_TextDB,$p
 
 }
 
-function textarea_csv($new_description, $insertQueryWordsDB, $insertQueryUploaded_TextDB)  //Записывает слова, а так же значения с формы textarea в textarea.csv
+function textarea_csv($new_description, $insertQueryWordsDB, $insertQueryUploaded_TextDB,$pdo)  //Записывает слова, а так же значения с формы textarea в textarea.csv
 {
     $text = count( explode(' ', $new_description) );
     $insertQueryUploaded_TextDB ->execute([$new_description,$text]);
     $Spaces = conversion($new_description);
     $result = array_count_values($Spaces);
-    $WordCount = count($Spaces); //Суммарное число слов
 
+    $text_id = $pdo -> lastInsertId();
 
     foreach ($result as $word => $count) {
-        $insertQueryWordsDB->execute([$word, $count]);
+        $insertQueryWordsDB->execute([$text_id,$word, $count]);
     }
-    $insertQueryWordsDB ->execute(["Сумарное число слов",$WordCount]);
 
 }
 
@@ -65,7 +63,7 @@ if (!empty($new_file)) {
     file_csv($new_file, $insertQueryWordsDB, $insertQueryUploaded_TextDB,$pdo);
 }
 if (!empty($new_description)) {
-    textarea_csv($new_description, $insertQueryWordsDB, $insertQueryUploaded_TextDB);
+    textarea_csv($new_description, $insertQueryWordsDB, $insertQueryUploaded_TextDB,$pdo);
 }
 ?>
 <!DOCTYPE html>
